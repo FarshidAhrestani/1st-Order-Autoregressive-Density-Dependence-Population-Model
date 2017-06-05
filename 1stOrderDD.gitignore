@@ -1,0 +1,52 @@
+############################################################# 
+# State-Space model for time-series elk/caribou count data
+# 1) System model: X[t+1] = b0 + (1+b1)X[t] + epsilon
+# X[t] & X[t-1] :loge(abundance) in year t & t-1 
+# b0 = Intinsic growth rate
+# b1 = 1st order density dependent autogregressive term
+# epsilon = process variance = a time-dependent stochastic term with mean=0 
+# 2) Observation model: Y[t] = X[t] + observation error 
+# Y[t] ~ normal(X[t], error)
+############################################################# 
+
+model	{
+  ### Parameters and Priors ###  
+
+  log.pop[1] ~ dnorm(obs.pop.1, 0.1);  # Prior for initial population; obs.pop.1=Y[1]
+
+  b0 ~ dnorm(0.0, 1.0E-6);                # Prior for intrinsic rate of increase
+  b1 ~ dnorm(0.0, 1.0E-6);                # Prior for 1st order density dependence
+
+  tau.proc ~ dgamma(1.0E-3, 1.0E-3);      # Prior for var. of state. process
+  var.proc <- 1/tau.proc;
+
+  #sigma.proc ~ dunif(0, 1);               
+  #tau.proc <- 1/pow(sigma.proc, 2);
+  #sigma2.proc <- pow(sigma.proc, 2);
+
+  tau.obs ~ dgamma(1.0E-3, 1.0E-3);       # Prior for var. of obs. process
+  var.obs <- 1/tau.obs;
+
+  #sigma.obs ~ dunif(0, 1);                
+  #tau.obs <- 1/pow(sigma.obs, 2);
+  #sigma2.obs <- pow(sigma.obs, 2);
+
+  ### State-Space model ###
+  
+  # System process model
+  for (t in 1:(length(Y)-1)){    
+    log.pop.mu[t+1] <- b0 + (b1+1)*log.pop[t];
+    #log.pop.mu[t+1] <- log.pop[t] + b0 + b1*log.pop[t];    
+    log.pop[t+1] ~ dnorm(log.pop.mu[t+1], tau.proc);
+  }
+
+  # Observation process model
+  for (t in 1:length(Y)){    
+		Y[t] ~ dnorm(log.pop[t], tau.obs);
+  }
+
+  # Population sizes on real scale
+  for (t in 1:length(Y)){
+    real.pop[t] <- exp(log.pop[t]);
+  }
+}
