@@ -27,18 +27,17 @@ model	{
   
   # System process model
   for (t in 1:(length(Y)-1)){    
-    log.pop.mu[t+1] <- b0 + (b1+1)*log.pop[t];
-    #log.pop.mu[t+1] <- log.pop[t] + b0 + b1*log.pop[t];    
-    log.pop[t+1] ~ dnorm(log.pop.mu[t+1], tau.proc);
+    	log.pop.mu[t+1] <- b0 + (b1+1)*log.pop[t];
+    	log.pop[t+1] ~ dnorm(log.pop.mu[t+1], tau.proc);
   }
 
   # Observation process model
   for (t in 1:length(Y)){    
-		Y[t] ~ dnorm(log.pop[t], tau.obs);
+	Y[t] ~ dnorm(log.pop[t], tau.obs);
   }
 
   # Population sizes on real scale
   for (t in 1:length(Y)){
-    real.pop[t] <- exp(log.pop[t]);
+  	real.pop[t] <- exp(log.pop[t]);
   }
 }
