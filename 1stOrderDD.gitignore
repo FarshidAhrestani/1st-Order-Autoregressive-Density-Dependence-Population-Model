@@ -20,16 +20,8 @@ model	{
   tau.proc ~ dgamma(1.0E-3, 1.0E-3);      # Prior for var. of state. process
   var.proc <- 1/tau.proc;
 
-  #sigma.proc ~ dunif(0, 1);               
-  #tau.proc <- 1/pow(sigma.proc, 2);
-  #sigma2.proc <- pow(sigma.proc, 2);
-
   tau.obs ~ dgamma(1.0E-3, 1.0E-3);       # Prior for var. of obs. process
   var.obs <- 1/tau.obs;
-
-  #sigma.obs ~ dunif(0, 1);                
-  #tau.obs <- 1/pow(sigma.obs, 2);
-  #sigma2.obs <- pow(sigma.obs, 2);
 
   ### State-Space model ###
   
